@@ -404,7 +404,7 @@ namespace TrainerReborn
             {
                 "MoneyWrench",
                 "77"
-            }               
+            }   
         };
         }
 
