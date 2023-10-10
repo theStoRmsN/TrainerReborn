@@ -16,7 +16,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using static FightingBossHitData;
 using static Mod.Courier.UI.TextEntryButtonInfo;
-using static UnityEngine.EventSystems.EventTrigger;
+// using static UnityEngine.EventSystems.EventTrigger;
 
 namespace TrainerReborn
 {
@@ -171,6 +171,8 @@ namespace TrainerReborn
 
         public bool restoreBlocks = false;
 
+        public bool startSkylandsOnManfred = true;
+
         public override void Load()
         {
             On.InGameHud.OnGUI += InGameHud_OnGUI;
@@ -269,8 +271,13 @@ namespace TrainerReborn
             {
                 Dicts.InitLevelDict();
             }
-        }
 
+            // Allow player to do beginning Skylands shmup if they travel by talking to Manfred in Glacial
+            On.GoToSkylandsCutscene.OnChoiceDone += StartSkylandsOnManfred;
+            // Any time Skylands is initialized, decide if player should start in the shmup section
+            On.ElementalSkylandsLevelInitializer.OnBeforeInitDone += RideManfredOnInit;
+
+        }        
 
         private void PlayerController_ReceiveHit1(On.PlayerController.orig_ReceiveHit orig, PlayerController self, HitData hitData)
         {
@@ -637,19 +644,37 @@ namespace TrainerReborn
                 EBits dimension = Manager<DimensionManager>.Instance.currentDimension;
                 Manager<PauseManager>.Instance.Resume();
                 Manager<UIManager>.Instance.GetView<OptionScreen>().Close(false);
-                string levelName = level.Equals("Surf", StringComparison.InvariantCultureIgnoreCase) ? Dicts.levelDict[level] : (Dicts.levelDict[level] + "_Build");
+                string levelName = level.Equals("Surf", StringComparison.InvariantCultureIgnoreCase) ? Dicts.levelDict[level] : (Dicts.levelDict[level] + "_Build");                
                 Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition = new Vector2(loadPos[0], loadPos[1]);
-                LevelLoadingInfo levelLoadingInfo = new LevelLoadingInfo(levelName, false, true, LoadSceneMode.Single, ELevelEntranceID.NONE, dimension);
+                LevelLoadingInfo levelLoadingInfo = new LevelLoadingInfo(levelName, false, true, LoadSceneMode.Single, ELevelEntranceID.NONE, dimension);              
                 Console.WriteLine("Teleporting to location " + tpLoc + " in " + level);
                 // Close mod options menu before TPing out
                 Courier.UI.ModOptionScreen?.Close(false);
+                Manager<AudioManager>.Instance.StopMusic();                            
 
-                Manager<AudioManager>.Instance.StopMusic();
-                Manager<LevelManager>.Instance.LoadLevel(levelLoadingInfo);
+                // If Skylands is destination, don't start on Manfred and TP normally                
+                if (level.Equals("elementalskylands", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    startSkylandsOnManfred = false;                    
+                }                 
+
+                Manager<LevelManager>.Instance.LoadLevel(levelLoadingInfo);                             
                 return true;
             }
             Console.WriteLine("Teleport Location set to an invalid value");
             return false;
+        }
+
+        private void RideManfredOnInit(On.ElementalSkylandsLevelInitializer.orig_OnBeforeInitDone orig, ElementalSkylandsLevelInitializer self)
+        {
+            self.startOnManfred = startSkylandsOnManfred;         
+            orig(self);
+        }
+
+        private void StartSkylandsOnManfred(On.GoToSkylandsCutscene.orig_OnChoiceDone orig, GoToSkylandsCutscene self, DialogChoice choice)
+        {
+            startSkylandsOnManfred = true;
+            orig(self, choice);
         }
 
         void OnFullReloadButton()

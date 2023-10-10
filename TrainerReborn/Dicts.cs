@@ -246,6 +246,18 @@ namespace TrainerReborn
                 "29"
             },
             {
+                "SecondWind",
+                "37"
+            },
+            {
+                "CurrentsMaster",
+                "39"
+            },
+            {
+                "Currents",
+                "39"
+            },
+            {
                 "LigthfootTabi", // Keep the typo in for people who are used to it
                 "40"
             },
@@ -260,6 +272,18 @@ namespace TrainerReborn
             {
                 "MagicBoots",
                 "40"
+            },
+            {
+                "WingsuitSlash",
+                "41"
+            },
+            {
+                "Aerobatics",
+                "41"
+            },
+            {
+                "WSS",
+                "41"
             },
             {
                 "Scroll",
@@ -350,6 +374,18 @@ namespace TrainerReborn
                 "60"
             },
             {
+                "DemonsBane",
+                "63"
+            },
+            {
+                "StrikeoftheNinja",
+                "64"
+            },
+            {
+                "Strike",
+                "64"
+            },
+            {
                 "Jukebox",
                 "73"
             },
@@ -368,7 +404,7 @@ namespace TrainerReborn
             {
                 "MoneyWrench",
                 "77"
-            }
+            }   
         };
         }
 
